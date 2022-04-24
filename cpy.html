@@ -7,35 +7,34 @@
     <title>Document</title>
     <link rel="stylesheet" href="./src/css/layui.css">
     <script src="./jquery-3.3.1.js"></script>
+    <style>
+        body {
+            height: 2000px;
+            border: 1px solid red;
+        }
+    </style>
 </head>
 <body>
-    <pre class="layui-code code1">
-        //代码区域1
-        var a = 'hello layui';
-
-        <ul>
-            <li>HTML将不会被解析</li>
-            <li>有木有感觉非常方便</li>
-        </ul>
-    </pre>
-    <pre class="layui-code code2">
-        //代码区域2
-        var a = 'hello layui';
-
-        <ul>
-            <li>HTML将不会被解析</li>
-            <li>有木有感觉非常方便</li>
-        </ul>
-    </pre>
+    <button class="layui-btn" lay-active="e1">事件1</button>
+    <button class="layui-btn" lay-active="e2">事件2</button>
+    <button class="layui-btn" lay-active="e3">事件3</button> 
+    <button>11</button>
     <script src="./src/layui.js"></script>
     <script>
-       layui.use('code', function(){
-           layui.code({
-             encode: true 
-           });
-       })
-       let elems = $('.layui-code');
-       console.log($(elems[0]).find('>li'))
+       layui.use('util', function(){
+           var util = layui.util;
+           util.event('lay-active', {
+                e1: function(othis){
+                    console.log('触发了事件1');
+                }
+                ,e2: function(othis){
+                    console.log('触发了事件2');
+                }
+                ,e3: function(othis){
+                    console.log('触发了事件3');
+                }
+            });
+       });
     </script>
 </body>
 </html>
