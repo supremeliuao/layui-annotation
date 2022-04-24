@@ -192,7 +192,7 @@ layui.define('jquery', function(exports){
 
                     show(item, height);
                     index = i;
-                    console.log(i, elemTop, end);
+                    
                     // 如果图片的 top 坐标, 超过了当前屏, 则终止后续图片的遍历
                     if(elemTop > end) break;
                 }

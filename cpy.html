@@ -9,8 +9,33 @@
     <script src="./jquery-3.3.1.js"></script>
 </head>
 <body>
+    <pre class="layui-code code1">
+        //代码区域1
+        var a = 'hello layui';
+
+        <ul>
+            <li>HTML将不会被解析</li>
+            <li>有木有感觉非常方便</li>
+        </ul>
+    </pre>
+    <pre class="layui-code code2">
+        //代码区域2
+        var a = 'hello layui';
+
+        <ul>
+            <li>HTML将不会被解析</li>
+            <li>有木有感觉非常方便</li>
+        </ul>
+    </pre>
     <script src="./src/layui.js"></script>
     <script>
+       layui.use('code', function(){
+           layui.code({
+             encode: true 
+           });
+       })
+       let elems = $('.layui-code');
+       console.log($(elems[0]).find('>li'))
     </script>
 </body>
 </html>
