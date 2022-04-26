@@ -15,26 +15,20 @@
     </style>
 </head>
 <body>
-    <button class="layui-btn" lay-active="e1">事件1</button>
-    <button class="layui-btn" lay-active="e2">事件2</button>
-    <button class="layui-btn" lay-active="e3">事件3</button> 
-    <button>11</button>
+    <div style="border: 1px solid red; margin-left: 200px;">
+        <div id="test1"></div>
+    </div>
     <script src="./src/layui.js"></script>
     <script>
-       layui.use('util', function(){
-           var util = layui.util;
-           util.event('lay-active', {
-                e1: function(othis){
-                    console.log('触发了事件1');
-                }
-                ,e2: function(othis){
-                    console.log('触发了事件2');
-                }
-                ,e3: function(othis){
-                    console.log('触发了事件3');
-                }
+        layui.use('rate', function(){
+            var rate = layui.rate;
+        
+            //渲染
+            var ins1 = rate.render({
+                elem: '#test1',  //绑定元素
+                text: true
             });
-       });
+        });
     </script>
 </body>
 </html>
