@@ -8,25 +8,29 @@
     <link rel="stylesheet" href="./src/css/layui.css">
     <script src="./jquery-3.3.1.js"></script>
     <style>
-        body {
-            height: 2000px;
-            border: 1px solid red;
-        }
     </style>
 </head>
 <body>
-    <div style="border: 1px solid red; margin-left: 200px;">
-        <div id="test1"></div>
-    </div>
+    <div class="layui-carousel" id="test1" lay-filter="test1">
+        <div carousel-item="">
+            <div style="background: red;">条目1</div>
+            <div style="background: green;">条目2</div>
+            <div style="background: rgb(119, 128, 0);">条目3</div>
+            <div style="background: rgb(0, 119, 128);">条目4</div>
+            <div style="background: rgb(28, 0, 128);">条目5</div>
+        </div>
+    </div> 
     <script src="./src/layui.js"></script>
     <script>
-        layui.use('rate', function(){
-            var rate = layui.rate;
-        
-            //渲染
-            var ins1 = rate.render({
-                elem: '#test1',  //绑定元素
-                text: true
+        layui.use('carousel', function(){
+            var carousel = layui.carousel
+            
+            //常规轮播
+            carousel.render({
+                elem: '#test1',
+                arrow: 'hover',
+                anim: 'updown',
+                full: true,
             });
         });
     </script>
