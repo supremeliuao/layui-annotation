@@ -8,29 +8,26 @@
     <link rel="stylesheet" href="./src/css/layui.css">
     <script src="./jquery-3.3.1.js"></script>
     <style>
+        #slideTest1{
+            margin: 100px;
+        }
     </style>
 </head>
 <body>
-    <div class="layui-carousel" id="test1" lay-filter="test1">
-        <div carousel-item="">
-            <div style="background: red;">条目1</div>
-            <div style="background: green;">条目2</div>
-            <div style="background: rgb(119, 128, 0);">条目3</div>
-            <div style="background: rgb(0, 119, 128);">条目4</div>
-            <div style="background: rgb(28, 0, 128);">条目5</div>
-        </div>
-    </div> 
+    <div id="slideTest1"></div> 
     <script src="./src/layui.js"></script>
     <script>
-        layui.use('carousel', function(){
-            var carousel = layui.carousel
+        layui.use('slider', function(){
+            var slider = layui.slider;
             
-            //常规轮播
-            carousel.render({
-                elem: '#test1',
-                arrow: 'hover',
-                anim: 'updown',
-                full: true,
+            //渲染
+            slider.render({
+                elem: '#slideTest1',  //绑定元素
+                input: true,
+                min: 5,
+                max:50,
+                value: [40,10],
+                showstep: true,
             });
         });
     </script>
