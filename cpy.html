@@ -9,60 +9,14 @@
     <script src="./jquery-3.3.1.js"></script>
 </head>
 <body>
-    <ul class="layui-nav">
-        <li class="layui-nav-item layui-this"><a href="">选中</a></li>
-        <li class="layui-nav-item">
-          <a href="javascript:;">常规</a>
-        </li>
-        <li class="layui-nav-item"><a href="">导航</a></li>
-        <li class="layui-nav-item">
-          <a href="javascript:;">子级</a>
-          <dl class="layui-nav-child">
-            <dd><a href="">菜单1</a></dd>
-            <dd><a href="">菜单2</a></dd>
-            <dd><a href="">菜单3</a></dd>
-          </dl>
-        </li>
-        <li class="layui-nav-item">
-          <a href="javascript:;">选项</a>
-          <dl class="layui-nav-child">
-            <dd><a href="">选项1</a></dd>
-            <dd class="layui-this"><a href="">选项2</a></dd>
-            <dd><a href="">选项3</a></dd>
-          </dl>
-        </li>
-        <li class="layui-nav-item"><a href="">演示</a></li>
-      </ul>
-
-      <ul class="layui-nav layui-nav-tree layui-inline" lay-filter="demo" style="margin-right: 10px;">
-        <li class="layui-nav-item layui-nav-itemed">
-          <a href="javascript:;">默认展开</a>
-          <dl class="layui-nav-child">
-            <dd><a href="javascript:;">选项一</a></dd>
-            <dd><a href="javascript:;">选项二</a></dd>
-            <dd><a href="javascript:;">选项三</a></dd>
-            <dd><a href="">跳转项</a></dd>
-          </dl>
-        </li>
-        <li class="layui-nav-item">
-          <a href="javascript:;">解决方案</a>
-          <dl class="layui-nav-child">
-            <dd><a href="">移动模块</a></dd>
-            <dd><a href="">后台模版</a></dd>
-            <dd><a href="">电商平台</a></dd>
-          </dl>
-        </li>
-        <li class="layui-nav-item"><a href="">云市场</a></li>
-        <li class="layui-nav-item"><a href="">社区</a></li>
-      </ul>
     <script src="./src/layui.js"></script>
     <script>
-        layui.use('element', function(){
-            var element = layui.element;
-
-            setTimeout(function(){
-                element.progress('one', '60%');
-            }, 4000);
+        layui.use('layer', function(){
+            var layer = layui.layer;
+        
+            layer.open({
+                type: 4, 
+            });
         });
     </script>
 </body>
