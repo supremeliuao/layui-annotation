@@ -9,13 +9,17 @@
     <script src="./jquery-3.3.1.js"></script>
 </head>
 <body>
+    <div id="test1"></div>
+    <div class="test1"></div>
     <script src="./src/layui.js"></script>
     <script>
-        layui.use('layer', function(){
-            var layer = layui.layer;
+        layui.use('laypage', function(){
+        var laypage = layui.laypage;
         
-            layer.open({
-                type: 4, 
+            //执行一个laypage实例
+            laypage.render({
+                elem: $('#test1'), //注意，这里的 test1 是 ID，不用加 # 号
+                count: 100,
             });
         });
     </script>
