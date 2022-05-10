@@ -33,7 +33,7 @@
         
         // 获取节点的 style 属性值
         getStyle: function(node, name){ // 和 layui.js 文件中代码一致, 不再赘述
-            var style = node.currentStyle ? node.currentStyle : win.getComputedStyle(node, null);
+            var style = node.currentStyle ? node.currentStyle : window.getComputedStyle(node, null);
             return style[style.getPropertyValue ? 'getPropertyValue' : 'getAttribute'](name);
         },
         

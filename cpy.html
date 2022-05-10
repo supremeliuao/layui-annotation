@@ -9,19 +9,66 @@
     <script src="./jquery-3.3.1.js"></script>
 </head>
 <body>
-    <div id="test1"></div>
-    <div class="test1"></div>
+    <button type="button" class="layui-btn" id="test1" lay-data="{url: '/a/'}">
+        <i class="layui-icon">&#xe67c;</i>上传图片
+    </button>
+    <button id="btn">点击</button>
+    <div class="layui-upload-drag" id="test10">
+        <i class="layui-icon"></i>
+        <p>点击上传，或将文件拖拽到此处</p>
+        <div class="layui-hide" id="uploadDemoView">
+          <hr>
+          <img src="" alt="上传成功后渲染" style="max-width: 196px">
+        </div>
+    </div>
+    
+    <button type="button" class="layui-btn layui-btn-normal" id="test8">选择文件</button>
+    <button type="button" class="layui-btn" id="test9">开始上传</button>
     <script src="./src/layui.js"></script>
     <script>
-        layui.use('laypage', function(){
-        var laypage = layui.laypage;
-        
-            //执行一个laypage实例
-            laypage.render({
-                elem: $('#test1'), //注意，这里的 test1 是 ID，不用加 # 号
-                count: 100,
+        layui.use('upload', function(){
+            var upload = layui.upload;
+            
+            //执行实例
+            var uploadInst = upload.render({
+                elem: '#test1', // 绑定元素
+                url: '/upload/', //上传接口
+                multiple: true, // 多选
+                done: function(res){
+                    //上传完毕回调
+                },
+                error: function(){
+                    //请求异常回调
+                }
+            });
+
+            upload.render({
+                elem: '#test10',
+                url: 'https://httpbin.org/post', //此处用的是第三方的 http 请求演示，实际使用时改成您自己的上传接口即可。
+                done: function(res){
+                    layer.msg('上传成功');
+                    layui.$('#uploadDemoView').removeClass('layui-hide').find('img').attr('src', res.files.file);
+                    console.log(res)
+                }
+            });
+
+            upload.render({
+                elem: '#test8'
+                ,url: '' //此处配置你自己的上传接口即可
+                ,auto: false
+                //,multiple: true
+                ,bindAction: '#test9'
+                ,done: function(res){
+                layer.msg('上传成功');
+                console.log(res)
+                }
             });
         });
+
+        // $('#btn').on('click.start', function(){
+        //     console.log('---click.start---');
+        // });
+        // $('#btn').off('click.o')
     </script>
 </body>
 </html>
