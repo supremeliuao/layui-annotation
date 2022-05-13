@@ -82,8 +82,6 @@ layui.define('layer', function(exports){
         layui.each(object, function(key, value){
           var itemElem = itemForm.find('[name="'+ key +'"]'); // 获取在当前 form 下属性为[name='xxx'] 的 dom, 其中key为用户传入的键
           var type;
-
-          console.log('遍历object', itemElem[0], itemElem[0].type);
           
           // 如果对应的表单不存在，则不执行
           if(!itemElem[0]) return;
@@ -110,29 +108,29 @@ layui.define('layer', function(exports){
       return that.getValue(filter);
     };
     
-    //取值
+    // 取值
     Form.prototype.getValue = function(filter, itemForm){
       itemForm = itemForm || $(ELEM + '[lay-filter="' + filter +'"]').eq(0);
           
-      var nameIndex = {} //数组 name 索引
-      ,field = {}
-      ,fieldElem = itemForm.find('input,select,textarea') //获取所有表单域
-      
+      var nameIndex = {}; // 数组 name 索引
+      var field = {};
+      var fieldElem = itemForm.find('input,select,textarea') // 获取所有表单域
+
       layui.each(fieldElem, function(_, item){ 
-        var othis = $(this)
-        ,init_name; //初始 name
+        var othis = $(this);
+        var init_name; // 初始 name
         
-        item.name = (item.name || '').replace(/^\s*|\s*&/, '');
+        item.name = (item.name || '').replace(/^\s*|\s*&/, ''); // 去除空格
         if(!item.name) return;
         
-        //用于支持数组 name
+        // 用于支持数组 name
         if(/^.*\[\]$/.test(item.name)){
           var key = item.name.match(/^(.*)\[\]$/g)[0];
           nameIndex[key] = nameIndex[key] | 0;
-          init_name = item.name.replace(/^(.*)\[\]$/, '$1['+ (nameIndex[key]++) +']');
+          init_name = item.name.replace(/^(.*)\[\]$/, '$1['+ (nameIndex[key]++) +']'); // 对 xxx[] 这里的 name 值进行编号
         }
         
-        if(/^checkbox|radio$/.test(item.type) && !item.checked) return;  //复选框和单选框未选中，不记录字段     
+        if(/^checkbox|radio$/.test(item.type) && !item.checked) return;  // 复选框和单选框未选中，不记录字段     
         field[init_name || item.name] = item.value;
       });
       
@@ -149,28 +147,33 @@ layui.define('layer', function(exports){
      * 第二个参数：filter，为 class="layui-form" 所在元素的 lay-filter="" 的值。你可以借助该参数，对表单完成局部更新。 
      */
     Form.prototype.render = function(type, filter){
-      var that = this
-      ,options = that.config
-      ,elemForm = $(ELEM + function(){
+      var that = this;
+      var options = that.config; // 获取配置
+      var elemForm = $(ELEM + function(){
         return filter ? ('[lay-filter="' + filter +'"]') : '';
-      }())
-      ,items = {
-        //输入框
+      }()); // 获取表单 dom 
+
+      var items = {
+        // 输入框
         input: function(){
-          var inputs = elemForm.find('input,textarea');
+          var inputs = elemForm.find('input,textarea'); // 寻找form表单下 input 和 textarea dom
           
-          //初始化全局的 autocomplete
+          // 初始化全局的 autocomplete
           options.autocomplete && inputs.attr('autocomplete', options.autocomplete);
-        }
+        },
         
-        //下拉选择框
-        ,select: function(){
-          var TIPS = '请选择', CLASS = 'layui-form-select', TITLE = 'layui-select-title'
-          ,NONE = 'layui-select-none', initValue = '', thatInput
-          ,selects = elemForm.find('select')
+        // 下拉选择框
+        select: function(){
+          var TIPS = '请选择';
+          var CLASS = 'layui-form-select'; // 需要 js 生成 select dom 类型
+          var TITLE = 'layui-select-title'; // 选择框的 title 类
+          var NONE = 'layui-select-none';
+          var initValue = '';
+          var thatInput;
+          var selects = elemForm.find('select'); // 获取 select dom
           
-          //隐藏 select
-          ,hide = function(e, clear){
+          // 隐藏 select
+          var hide = function(e, clear){
             if(!$(e.target).parent().hasClass(TITLE) || clear){
               $('.'+CLASS).removeClass(CLASS+'ed ' + CLASS+'up');
               thatInput && initValue && thatInput.val(initValue);
@@ -178,87 +181,92 @@ layui.define('layer', function(exports){
             thatInput = null;
           }
           
-          //各种事件
-          ,events = function(reElem, disabled, isSearch){
-            var select = $(this)
-            ,title = reElem.find('.' + TITLE)
-            ,input = title.find('input')
-            ,dl = reElem.find('dl')
-            ,dds = dl.children('dd')
-            ,index =  this.selectedIndex //当前选中的索引
-            ,nearElem; //select 组件当前选中的附近元素，用于辅助快捷键功能
-            
+          // 各种事件
+          var events = function(reElem, disabled, isSearch){
+            var select = $(this); // select 元素 dom
+            var title = reElem.find('.' + TITLE); // reElem 是生成的替代select的dom元素。获取reElem dom 下的 layui-select-title 类 dom
+            var input = title.find('input'); // 获取 title 下的 input dom
+            var dl = reElem.find('dl'); // 获取 reElem 下的 dl dom
+            var dds = dl.children('dd'); // 获取 dl 下的 dd dom 集合
+            var index =  this.selectedIndex; // 当前选中的索引
+            var nearElem; // select 组件当前选中的附近元素，用于辅助快捷键功能
+
+            // 如果禁止, 后续不执行
             if(disabled) return;
             
-            //展开下拉
+            // 展开下拉
             var showDown = function(){
-              var top = reElem.offset().top + reElem.outerHeight() + 5 - $win.scrollTop()
-              ,dlHeight = dl.outerHeight();
               
-              index = select[0].selectedIndex; //获取最新的 selectedIndex
-              reElem.addClass(CLASS+'ed');
-              dds.removeClass(HIDE);
+              // outerHeight() 方法返回第一个匹配元素的外部高度。该方法包含 padding 和 border。如需包含 margin，请使用 outerHeight(true)。
+              // scrollTop() 方法设置或返回被选元素的垂直滚动条位置。
+              var top = reElem.offset().top + reElem.outerHeight() + 5 - $win.scrollTop(); // 获取该元素到可视顶部的距离
+              var dlHeight = dl.outerHeight(); // 获取除了 margin 高度
+
+              index = select[0].selectedIndex; // 获取最新的 selectedIndex
+              reElem.addClass(CLASS+'ed'); // 添加 layui-form-selected 类
+              dds.removeClass(HIDE); // 取消隐藏
               nearElem = null;
   
-              //初始选中样式
+              // 为 index 添加初始选中样式
               dds.eq(index).addClass(THIS).siblings().removeClass(THIS);
   
-              //上下定位识别
+              // 上下定位识别
               if(top + dlHeight > $win.height() && top >= dlHeight){
-                reElem.addClass(CLASS + 'up');
+                reElem.addClass(CLASS + 'up'); // 添加距上的定位
               }
               
               followScroll();
             }
             
-            //隐藏下拉
-            ,hideDown = function(choose){
-              reElem.removeClass(CLASS+'ed ' + CLASS+'up');
-              input.blur();
+            // 隐藏下拉
+            var hideDown = function(choose){
+              reElem.removeClass(CLASS+'ed ' + CLASS+'up'); // 移除 layui-form-selected layui-form-selectup 类
+              input.blur(); // 失去焦点
               nearElem = null;
-              
+               
+              // choose 隐式为 true, 后续不执行
               if(choose) return;
               
               notOption(input.val(), function(none){
-                var selectedIndex = select[0].selectedIndex;
-                
-                //未查询到相关值
+                var selectedIndex = select[0].selectedIndex; // 获取索引值
+
+                // 未查询到相关值
                 if(none){
-                  initValue = $(select[0].options[selectedIndex]).html(); //重新获得初始选中值
-                  
-                  //如果是第一项，且文本值等于 placeholder，则清空初始值
+                  initValue = $(select[0].options[selectedIndex]).html(); // 重新获得初始选中值
+
+                  // 如果是第一项，且文本值等于 placeholder，则清空初始值
                   if(selectedIndex === 0 && initValue === input.attr('placeholder')){
                     initValue = '';
                   };
   
-                  //如果有选中值，则将输入框纠正为该值。否则清空输入框
+                  // 如果有选中值，则将输入框纠正为该值。否则清空输入框
                   input.val(initValue || '');
                 }
               });
             }
             
-            //定位下拉滚动条
-            ,followScroll = function(){  
-              var thisDd = dl.children('dd.'+ THIS);
+            // 定位下拉滚动条
+            var followScroll = function(){
+              var thisDd = dl.children('dd.'+ THIS); // 获取 dl 下面 layui-this的dl dom
               
               if(!thisDd[0]) return;
               
-              var posTop = thisDd.position().top
-              ,dlHeight = dl.height()
-              ,ddHeight = thisDd.height();
-              
-              //若选中元素在滚动条不可见底部
-              if(posTop > dlHeight){
+              var posTop = thisDd.position().top; // position() 方法返回第一个匹配元素的位置（相对于它的父元素）。
+              var dlHeight = dl.height();
+              var ddHeight = thisDd.height();
+
+              // 若选中元素在滚动条不可见底部
+              if(posTop > dlHeight){ // 如果当前选择的dd的高度大于dl高度时，滚动条滚动到当前位置
                 dl.scrollTop(posTop + dl.scrollTop() - dlHeight + ddHeight - 5);
               }
               
-              //若选择玄素在滚动条不可见顶部
-              if(posTop < 0){
+              // 若选择玄素在滚动条不可见顶部
+              if(posTop < 0){// 如果当前选择的dd的高度小于0，滚动条滚动到当前位置
                 dl.scrollTop(posTop + dl.scrollTop() - 5);
               }
             };
             
-            //点击标题区域
+            // 点击标题区域
             title.on('click', function(e){
               reElem.hasClass(CLASS+'ed') ? (
                 hideDown()
@@ -348,16 +356,20 @@ layui.define('layer', function(exports){
               }
             });
             
-            //检测值是否不属于 select 项
+            // 检测值是否不属于 select 项
             var notOption = function(value, callback, origin){
               var num = 0;
+
+              // 循环 dds
               layui.each(dds, function(){
-                var othis = $(this)
-                ,text = othis.text()
-                ,not = text.indexOf(value) === -1;
+                var othis = $(this); // 获取当前 this
+                var text = othis.text(); // 获取当前 this 的文本值
+                var not = text.indexOf(value) === -1;
                 if(value === '' || (origin === 'blur') ? value !== text : not) num++;
                 origin === 'keyup' && othis[not ? 'addClass' : 'removeClass'](HIDE);
               });
+
+              // 如果 num 等于 dd集合的 length时, 说明当前点击的select并select值为placeholder
               var none = num === dds.length;
               return callback(none), none;
             };
@@ -622,11 +634,14 @@ layui.define('layer', function(exports){
           });
         }
       };
+
+      // 判断 type 是否存在, 如果存在只对 type 进行更新，否则对全部类型的表单进行一次更新
       type ? (
         items[type] ? items[type]() : hint.error('不支持的 "'+ type + '" 表单渲染')
       ) : layui.each(items, function(index, item){
         item();
       });
+
       return that;
     };
     
