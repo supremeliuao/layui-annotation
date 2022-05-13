@@ -1,110 +1,112 @@
-
-/*!
- * form 表单组件
- * MIT Licensed
- */
- 
 layui.define('layer', function(exports){
     "use strict";
     
-    var $ = layui.$
-    ,layer = layui.layer
-    ,hint = layui.hint()
-    ,device = layui.device()
+    var $ = layui.$;
+    var layer = layui.layer;
+    var hint = layui.hint();
+    var device = layui.device();
     
-    ,MOD_NAME = 'form', ELEM = '.layui-form', THIS = 'layui-this'
-    ,SHOW = 'layui-show', HIDE = 'layui-hide', DISABLED = 'layui-disabled'
+    var MOD_NAME = 'form'; // 模块名
+    var ELEM = '.layui-form'; // 表单页面
+    var THIS = 'layui-this';
+    var SHOW = 'layui-show'; // 显示
+    var HIDE = 'layui-hide'; // 隐藏
+    var DISABLED = 'layui-disabled'; // 禁用
     
-    ,Form = function(){
+    var Form = function(){
+      
+      // 配置
       this.config = {
-        verify: {
+        verify: { // 验证配置
           required: [
-            /[\S]+/
-            ,'必填项不能为空'
-          ]
-          ,phone: [
-            /^1\d{10}$/
-            ,'请输入正确的手机号'
-          ]
-          ,email: [
-            /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/
-            ,'邮箱格式不正确'
-          ]
-          ,url: [
-            /^(#|(http(s?)):\/\/|\/\/)[^\s]+\.[^\s]+$/
-            ,'链接格式不正确'
-          ]
-          ,number: function(value){
+            /[\S]+/, // \S 查找非空白字符
+            '必填项不能为空'
+          ],
+          phone: [
+            /^1\d{10}$/, // \d 查找数字
+            '请输入正确的手机号'
+          ],
+          email: [
+            /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/,
+            '邮箱格式不正确'
+          ],
+          url: [
+            /^(#|(http(s?)):\/\/|\/\/)[^\s]+\.[^\s]+$/,
+            '链接格式不正确'
+          ],
+          number: function(value){
             if(!value || isNaN(value)) return '只能填写数字'
-          }
-          ,date: [
-            /^(\d{4})[-\/](\d{1}|0\d{1}|1[0-2])([-\/](\d{1}|0\d{1}|[1-2][0-9]|3[0-1]))*$/
-            ,'日期格式不正确'
+          },
+          date: [
+            /^(\d{4})[-\/](\d{1}|0\d{1}|1[0-2])([-\/](\d{1}|0\d{1}|[1-2][0-9]|3[0-1]))*$/,
+            '日期格式不正确'
+          ],
+          identity: [
+            /(^\d{15}$)|(^\d{17}(x|X|\d)$)/,
+            '请输入正确的身份证号'
           ]
-          ,identity: [
-            /(^\d{15}$)|(^\d{17}(x|X|\d)$)/
-            ,'请输入正确的身份证号'
-          ]
-        }
-        ,autocomplete: null //全局 autocomplete 状态。null 表示不干预
+        },
+        autocomplete: null // 全局 autocomplete 状态。null 表示不干预
       };
     };
     
-    //全局设置
+    // 全局设置
     Form.prototype.set = function(options){
       var that = this;
-      $.extend(true, that.config, options);
+      $.extend(true, that.config, options); // 设置配置
       return that;
     };
     
-    //验证规则设定
+    // 验证规则设定。verify 函数可用于用户自定义复杂验证
     Form.prototype.verify = function(settings){
       var that = this;
       $.extend(true, that.config.verify, settings);
       return that;
     };
     
-    //表单事件
+    // 表单事件
     Form.prototype.on = function(events, callback){
       return layui.onevent.call(this, MOD_NAME, events, callback);
     };
     
-    //赋值/取值
+    // val 函数用于给指定表单集合的元素赋值和取值。如果 object 参数存在，则为赋值；如果 object 参数不存在，则为取值。
     Form.prototype.val = function(filter, object){
-      var that = this
-      ,formElem = $(ELEM + '[lay-filter="' + filter +'"]');
-      
-      //遍历
+      var that = this;
+      var formElem = $(ELEM + '[lay-filter="' + filter +'"]'); // 获取 .layui-form[lay-filter='xxx'] dom
+
+      // 遍历获取到的 dom
       formElem.each(function(index, item){
-        var itemForm = $(this);
+        var itemForm = $(this); // 获取 form item
         
-        //赋值
+        // 遍历 object(object为null、undefin、[]或者{}不遍历), 进行赋值
         layui.each(object, function(key, value){
-          var itemElem = itemForm.find('[name="'+ key +'"]')
-          ,type;
+          var itemElem = itemForm.find('[name="'+ key +'"]'); // 获取在当前 form 下属性为[name='xxx'] 的 dom, 其中key为用户传入的键
+          var type;
+
+          console.log('遍历object', itemElem[0], itemElem[0].type);
           
-          //如果对应的表单不存在，则不执行
+          // 如果对应的表单不存在，则不执行
           if(!itemElem[0]) return;
-          type = itemElem[0].type;
+          type = itemElem[0].type; // 获取当前 dom 类型
           
-          //如果为复选框
+          // 如果为复选框
           if(type === 'checkbox'){
-            itemElem[0].checked = value;
-          } else if(type === 'radio') { //如果为单选框
-            itemElem.each(function(){
+            itemElem[0].checked = value; // 赋值
+          } else if(type === 'radio') { // 如果为单选框
+            itemElem.each(function(){ // 遍历单选框
               if(this.value == value ){
                 this.checked = true
               }     
             });
           } else { //其它类型的表单
-            itemElem.val(value);
+            itemElem.val(value); // 使用 val() 赋值
           }
         });
       });
       
-      form.render(null, filter);
+      form.render(null, filter); // 因为不是双向数据绑定，所以需要重新渲染全部
       
-      //返回值
+      // 返回值
       return that.getValue(filter);
     };
     
@@ -137,7 +139,15 @@ layui.define('layer', function(exports){
       return field;
     };
     
-    //表单控件渲染
+    /**
+     * 表单控件渲染
+     * 第一个参数：type，为表单的 type 类型，可选。默认对全部类型的表单进行一次更新。可局部刷新的 type 如下
+     * 参数（type）值           描述
+     * select                  刷新select选择框渲染
+     * checkbox                刷新checkbox复选框（含开关）渲染
+     * radio                   刷新radio单选框框渲染  
+     * 第二个参数：filter，为 class="layui-form" 所在元素的 lay-filter="" 的值。你可以借助该参数，对表单完成局部更新。 
+     */
     Form.prototype.render = function(type, filter){
       var that = this
       ,options = that.config
@@ -716,26 +726,30 @@ layui.define('layer', function(exports){
       });
     };
   
-    //自动完成渲染
-    var form = new Form()
-    ,$dom = $(document), $win = $(window);
+    // 自动完成渲染
+    var form = new Form();
+    var $dom = $(document); // 获取 document dom
+    var $win = $(window); // 获取 window dom
     
+    // 立即执行函数
     $(function(){
       form.render();
     });
     
-    //表单reset重置渲染
+    // 给 .layui-form 类添加 reset 事件
     $dom.on('reset', ELEM, function(){
-      var filter = $(this).attr('lay-filter');
+      var filter = $(this).attr('lay-filter'); // 获取 lay-filter 属性值
+      
       setTimeout(function(){
-        form.render(null, filter);
+        form.render(null, filter); // 重新渲染
       }, 50);
     });
     
-    //表单提交事件
+    // 给 .layui-form 类添加 submit 事件 和 click 事件
     $dom.on('submit', ELEM, submit)
     .on('click', '*[lay-submit]', submit);
     
+    // 导出模块
     exports(MOD_NAME, form);
 });
   
