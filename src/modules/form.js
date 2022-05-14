@@ -268,58 +268,62 @@ layui.define('layer', function(exports){
             
             // 点击标题区域
             title.on('click', function(e){
+
+              // 判断当前是否存在 layui-form-selected类，存在则调用隐藏下拉，否则展开下拉
               reElem.hasClass(CLASS+'ed') ? (
                 hideDown()
               ) : (
                 hide(e, true), 
                 showDown()
               );
-              dl.find('.'+NONE).remove();
+              dl.find('.'+NONE).remove(); // 移除 layui-select-none 类
             }); 
             
-            //点击箭头获取焦点
+            // 点击箭头获取焦点
             title.find('.layui-edge').on('click', function(){
               input.focus();
             });
             
-            //select 中 input 键盘事件
-            input.on('keyup', function(e){ //键盘松开
+            // select 中 input 键盘事件
+            input.on('keyup', function(e){ // 键盘松开
               var keyCode = e.keyCode;
               
-              //Tab键展开
-              if(keyCode === 9){
+              // Tab键展开
+              if(keyCode === 9){ // tab 键
                 showDown();
               }
-            }).on('keydown', function(e){ //键盘按下
+            }).on('keydown', function(e){ // 键盘按下
               var keyCode = e.keyCode;
   
-              //Tab键隐藏
+              // Tab键隐藏
               if(keyCode === 9){
                 hideDown();
               }
               
-              //标注 dd 的选中状态
+              // 标注 dd 的选中状态
               var setThisDd = function(prevNext, thisElem1){
-                var nearDd, cacheNearElem
+                var nearDd;
+                var cacheNearElem;
                 e.preventDefault();
   
-                //得到当前队列元素  
+                // 得到当前队列元素  
                 var thisElem = function(){
                   var thisDd = dl.children('dd.'+ THIS);
-                  
-                  //如果是搜索状态，且按 Down 键，且当前可视 dd 元素在选中元素之前，
-                  //则将当前可视 dd 元素的上一个元素作为虚拟的当前选中元素，以保证递归不中断
+
+                  // 如果是搜索状态，且按 Down 键，且当前可视 dd 元素在选中元素之前，
+                  // 则将当前可视 dd 元素的上一个元素作为虚拟的当前选中元素，以保证递归不中断
                   if(dl.children('dd.'+  HIDE)[0] && prevNext === 'next'){
-                    var showDd = dl.children('dd:not(.'+ HIDE +',.'+ DISABLED +')')
-                    ,firstIndex = showDd.eq(0).index();
+                    var showDd = dl.children('dd:not(.'+ HIDE +',.'+ DISABLED +')');
+                    var firstIndex = showDd.eq(0).index();
                     if(firstIndex >=0 && firstIndex < thisDd.index() && !showDd.hasClass(THIS)){
                       return showDd.eq(0).prev()[0] ? showDd.eq(0).prev() : dl.children(':last');
                     }
                   }
-  
+
                   if(thisElem1 && thisElem1[0]){
                     return thisElem1;
                   }
+
                   if(nearElem && nearElem[0]){
                     return nearElem;
                   }
@@ -331,13 +335,13 @@ layui.define('layer', function(exports){
                 cacheNearElem = thisElem[prevNext](); //当前元素的附近元素
                 nearDd =  thisElem[prevNext]('dd:not(.'+ HIDE +')'); //当前可视元素的 dd 元素
   
-                //如果附近的元素不存在，则停止执行，并清空 nearElem
+                // 如果附近的元素不存在，则停止执行，并清空 nearElem
                 if(!cacheNearElem[0]) return nearElem = null;
                 
-                //记录附近的元素，让其成为下一个当前元素
+                // 记录附近的元素，让其成为下一个当前元素
                 nearElem = thisElem[prevNext]();
   
-                //如果附近不是 dd ，或者附近的 dd 元素是禁用状态，则进入递归查找
+                // 如果附近不是 dd ，或者附近的 dd 元素是禁用状态，则进入递归查找
                 if((!nearDd[0] || nearDd.hasClass(DISABLED)) && nearElem[0]){
                   return setThisDd(prevNext, nearElem);
                 }
@@ -346,13 +350,13 @@ layui.define('layer', function(exports){
                 followScroll(); //定位滚动条
               };
               
-              if(keyCode === 38) setThisDd('prev'); //Up 键
-              if(keyCode === 40) setThisDd('next'); //Down 键
+              if(keyCode === 38) setThisDd('prev'); // Up 键
+              if(keyCode === 40) setThisDd('next'); // Down 键
               
-              //Enter 键
+              // Enter 键
               if(keyCode === 13){ 
-                e.preventDefault();
-                dl.children('dd.'+THIS).trigger('click');
+                e.preventDefault(); // 阻止默认行为
+                dl.children('dd.'+THIS).trigger('click'); // 给当前选择的dl触发 click事件
               }
             });
             
@@ -374,10 +378,11 @@ layui.define('layer', function(exports){
               return callback(none), none;
             };
             
-            //搜索匹配
+            // 搜索匹配
             var search = function(e){
               var value = this.value, keyCode = e.keyCode;
               
+              // Tab:9,Enter:13,Left Arrow:37,Up Arrow:38,Right Arrow:39,Dw Arrow:40
               if(keyCode === 9 || keyCode === 13 
                 || keyCode === 37 || keyCode === 38 
                 || keyCode === 39 || keyCode === 40
@@ -386,6 +391,7 @@ layui.define('layer', function(exports){
               }
               
               notOption(value, function(none){
+                // 没有匹配项项时，显示无匹配否则显示匹配到的元素
                 if(none){
                   dl.find('.'+NONE)[0] || dl.append('<p class="'+ NONE +'">无匹配项</p>');
                 } else {
@@ -404,10 +410,10 @@ layui.define('layer', function(exports){
               input.on('keyup', search).on('blur', function(e){
                 var selectedIndex = select[0].selectedIndex;
                 
-                thatInput = input; //当前的 select 中的 input 元素
-                initValue = $(select[0].options[selectedIndex]).html(); //重新获得初始选中值
+                thatInput = input; // 当前的 select 中的 input 元素
+                initValue = $(select[0].options[selectedIndex]).html(); // 重新获得初始选中值
                 
-                //如果是第一项，且文本值等于 placeholder，则清空初始值
+                // 如果是第一项，且文本值等于 placeholder，则清空初始值
                 if(selectedIndex === 0 && initValue === input.attr('placeholder')){
                   initValue = '';
                 };
@@ -420,13 +426,16 @@ layui.define('layer', function(exports){
               });
             }
   
-            //选择
+            // 选择
             dds.on('click', function(){
-              var othis = $(this), value = othis.attr('lay-value');
+              var othis = $(this);
+              var value = othis.attr('lay-value');
               var filter = select.attr('lay-filter'); //获取过滤器
-              
+
+              // 如果当前dd有layui-disabled类后续不执行
               if(othis.hasClass(DISABLED)) return false;
               
+              // 如果当前dd有layui-select-tips类，input的值设为空，否则赋值该值并添加THIS类
               if(othis.hasClass('layui-select-tips')){
                 input.val('');
               } else {
@@ -434,15 +443,17 @@ layui.define('layer', function(exports){
                 othis.addClass(THIS);
               }
   
-              othis.siblings().removeClass(THIS);
-              select.val(value).removeClass('layui-form-danger')
+              othis.siblings().removeClass(THIS); // 移除其他dom layui-this类
+              select.val(value).removeClass('layui-form-danger');
+              
+              // 添加事件
               layui.event.call(this, MOD_NAME, 'select('+ filter +')', {
-                elem: select[0]
-                ,value: value
-                ,othis: reElem
+                elem: select[0],
+                value: value,
+                othis: reElem
               });
   
-              hideDown(true);
+              hideDown(true); // 隐藏下拉
               return false;
             });
             
@@ -450,21 +461,24 @@ layui.define('layer', function(exports){
               return false;
             });
             
-            $(document).off('click', hide).on('click', hide); //点击其它元素关闭 select
+            $(document).off('click', hide).on('click', hide); // 点击其它元素关闭 select
           }
           
+          // 对在form表单下的所有select遍历
           selects.each(function(index, select){
-            var othis = $(this)
-            ,hasRender = othis.next('.'+CLASS)
-            ,disabled = this.disabled
-            ,value = select.value
-            ,selected = $(select.options[select.selectedIndex]) //获取当前选中项
-            ,optionsFirst = select.options[0];
+            var othis = $(this);
+            var hasRender = othis.next('.'+CLASS); // 是否已经渲染手动构造的select
+            var disabled = this.disabled; // 获取当前select是否disabled
+            var value = select.value; // 获取select选中的值
+            var selected = $(select.options[select.selectedIndex]); //获取当前选中项
+            var optionsFirst = select.options[0]; // 获取第一个 options
+
+            // 如果当前select忽略元素美化处理，后续不执行
+            if(typeof othis.attr('lay-ignore') === 'string') return othis.show(); // 显示当前 select
             
-            if(typeof othis.attr('lay-ignore') === 'string') return othis.show();
-            
-            var isSearch = typeof othis.attr('lay-search') === 'string'
-            ,placeholder = optionsFirst ? (
+            // 判断当前select是否支持搜素
+            var isSearch = typeof othis.attr('lay-search') === 'string';
+            var placeholder = optionsFirst ? (
               optionsFirst.value ? TIPS : (optionsFirst.innerHTML || TIPS)
             ) : TIPS;
   

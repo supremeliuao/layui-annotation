@@ -150,7 +150,7 @@
         <div class="layui-form-item">
           <label class="layui-form-label">联动选择框</label>
           <div class="layui-input-inline">
-            <select name="quiz1">
+            <select name="quiz1" lay-ignore="">
               <option value="">请选择省</option>
               <option value="浙江" selected="">浙江省</option>
               <option value="你的工号">江西省</option>
@@ -249,13 +249,17 @@
     <script src="./src/layui.js"></script>
     <script>
         layui.use(['form'], function(){
-            var form = layui.form;
+            // var form = layui.form;
             
-            let result = form.val('kinghiee', {
-                email: 'superhiee@163.com',
-                sex: '女'
-            });
+            // let result = form.val('kinghiee', {
+            //     email: 'superhiee@163.com',
+            //     sex: '女'
+            // });
         });
+        $('#one').on('click', function(){
+          console.log($('#two')[0].value);
+          return false;
+        })
     </script>
 </body>
 </html>
