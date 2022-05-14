@@ -471,30 +471,34 @@ layui.define('layer', function(exports){
             var disabled = this.disabled; // 获取当前select是否disabled
             var value = select.value; // 获取select选中的值
             var selected = $(select.options[select.selectedIndex]); //获取当前选中项
-            var optionsFirst = select.options[0]; // 获取第一个 options
+            var optionsFirst = select.options[0]; // 获取第一个 option
 
             // 如果当前select忽略元素美化处理，后续不执行
             if(typeof othis.attr('lay-ignore') === 'string') return othis.show(); // 显示当前 select
             
             // 判断当前select是否支持搜素
             var isSearch = typeof othis.attr('lay-search') === 'string';
+
+            // 第一个option不存在时,则使用TIPS,否则进行下面判断取值
             var placeholder = optionsFirst ? (
+
+              // optionsFirst.value 存在值时，使用TIPS否则使用optionsFirst.innerHTML或者TIPS
               optionsFirst.value ? TIPS : (optionsFirst.innerHTML || TIPS)
             ) : TIPS;
   
-            //替代元素
-            var reElem = $(['<div class="'+ (isSearch ? '' : 'layui-unselect ') + CLASS 
-            ,(disabled ? ' layui-select-disabled' : '') +'">'
-              ,'<div class="'+ TITLE +'">'
-                ,('<input type="text" placeholder="'+ $.trim(placeholder) +'" '
+            // 替代元素
+            var reElem = $(['<div class="'+ (isSearch ? '' : 'layui-unselect ') + CLASS,
+            (disabled ? ' layui-select-disabled' : '') +'">',
+              '<div class="'+ TITLE +'">',
+                ('<input type="text" placeholder="'+ $.trim(placeholder) +'" '
                   +('value="'+ $.trim(value ? selected.html() : '') +'"') //默认值
                   +((!disabled && isSearch) ? '' : ' readonly') //是否开启搜索
                   +' class="layui-input'
                   +(isSearch ? '' : ' layui-unselect') 
-                + (disabled ? (' ' + DISABLED) : '') +'">') //禁用状态
-              ,'<i class="layui-edge"></i></div>'
-              ,'<dl class="layui-anim layui-anim-upbit'+ (othis.find('optgroup')[0] ? ' layui-select-group' : '') +'">'
-              ,function(options){
+                + (disabled ? (' ' + DISABLED) : '') +'">'), //禁用状态
+              '<i class="layui-edge"></i></div>',
+              '<dl class="layui-anim layui-anim-upbit'+ (othis.find('optgroup')[0] ? ' layui-select-group' : '') +'">',
+              function(options){
                 var arr = [];
                 layui.each(options, function(index, item){
                   if(index === 0 && !item.value){
@@ -507,39 +511,41 @@ layui.define('layer', function(exports){
                 });
                 arr.length === 0 && arr.push('<dd lay-value="" class="'+ DISABLED +'">没有选项</dd>');
                 return arr.join('');
-              }(othis.find('*')) +'</dl>'
-            ,'</div>'].join(''));
+              }(othis.find('*')) +'</dl>',
+            '</div>'].join(''));
             
-            hasRender[0] && hasRender.remove(); //如果已经渲染，则Rerender
+            hasRender[0] && hasRender.remove(); // 如果已经渲染，则Rerender
             othis.after(reElem);          
             events.call(this, reElem, disabled, isSearch);
           });
-        }
+        },
         
-        //复选框/开关
-        ,checkbox: function(){
+        // 复选框/开关
+        checkbox: function(){
           var CLASS = {
-            checkbox: ['layui-form-checkbox', 'layui-form-checked', 'checkbox']
-            ,_switch: ['layui-form-switch', 'layui-form-onswitch', 'switch']
-          }
-          ,checks = elemForm.find('input[type=checkbox]')
+            checkbox: ['layui-form-checkbox', 'layui-form-checked', 'checkbox'], // 复选框类
+            _switch: ['layui-form-switch', 'layui-form-onswitch', 'switch'] // 开关类
+          };
+          var checks = elemForm.find('input[type=checkbox]'); // 获取复选框 dom 结合
           
-          ,events = function(reElem, RE_CLASS){
+          var events = function(reElem, RE_CLASS){
             var check = $(this);
             
-            //勾选
+            // 给替代的dom添加click事件用于勾选
             reElem.on('click', function(){
-              var filter = check.attr('lay-filter') //获取过滤器
-              ,text = (check.attr('lay-text')||'').split('|');
-  
+              var filter = check.attr('lay-filter'); // 获取过滤器
+              var text = (check.attr('lay-text')||'').split('|');
+
+              // 如果禁用后续不执行
               if(check[0].disabled) return;
               
+              // 这里的功能类似trigger()
               check[0].checked ? (
-                check[0].checked = false
-                ,reElem.removeClass(RE_CLASS[1]).find('em').text(text[1])
+                check[0].checked = false,
+                reElem.removeClass(RE_CLASS[1]).find('em').text(text[1])
               ) : (
-                check[0].checked = true
-                ,reElem.addClass(RE_CLASS[1]).find('em').text(text[0])
+                check[0].checked = true,
+                reElem.addClass(RE_CLASS[1]).find('em').text(text[0])
               );
               
               layui.event.call(check[0], MOD_NAME, RE_CLASS[2]+'('+ filter +')', {
@@ -550,98 +556,114 @@ layui.define('layer', function(exports){
             });
           }
           
+          // 对在form表单下的所有input[type=checkbox]遍历
           checks.each(function(index, check){
-            var othis = $(this), skin = othis.attr('lay-skin')
-            ,text = (othis.attr('lay-text') || '').split('|'), disabled = this.disabled;
-            if(skin === 'switch') skin = '_'+skin;
-            var RE_CLASS = CLASS[skin] || CLASS.checkbox;
+            var othis = $(this);
+            var skin = othis.attr('lay-skin'); // 获取当前复选框皮肤
+            var text = (othis.attr('lay-text') || '').split('|'); // 获取文案
+            var disabled = this.disabled;
+            if(skin === 'switch') skin = '_'+skin; // 判断当前选择的皮肤类型是否为开关类
+            var RE_CLASS = CLASS[skin] || CLASS.checkbox; // 原始类型默认为checkbox
             
+            // 如果当前input[type=checkbox]忽略元素美化处理，后续不执行
             if(typeof othis.attr('lay-ignore') === 'string') return othis.show();
             
-            //替代元素
-            var hasRender = othis.next('.' + RE_CLASS[0])
-            ,reElem = $(['<div class="layui-unselect '+ RE_CLASS[0]
-              ,(check.checked ? (' '+ RE_CLASS[1]) : '') //选中状态
-              ,(disabled ? ' layui-checkbox-disabled '+ DISABLED : '') //禁用状态
-              ,'"'
-              ,(skin ? ' lay-skin="'+ skin +'"' : '') //风格
-            ,'>'
-            ,function(){ //不同风格的内容
-              var title = check.title.replace(/\s/g, '')
-              ,type = {
-                //复选框
+            // 替代元素
+            var hasRender = othis.next('.' + RE_CLASS[0]);
+            var reElem = $(['<div class="layui-unselect '+ RE_CLASS[0],
+              (check.checked ? (' '+ RE_CLASS[1]) : ''), // 选中状态
+              (disabled ? ' layui-checkbox-disabled '+ DISABLED : ''), // 禁用状态
+              '"',
+              (skin ? ' lay-skin="'+ skin +'"' : ''), // 风格
+            '>',
+            function(){ // 不同风格的内容
+              var title = check.title.replace(/\s/g, ''),
+              type = {
+                // 复选框
                 checkbox: [
-                  (title ? ('<span>'+ check.title +'</span>') : '')
-                  ,'<i class="layui-icon layui-icon-ok"></i>'
-                ].join('')
+                  (title ? ('<span>'+ check.title +'</span>') : ''),
+                  '<i class="layui-icon layui-icon-ok"></i>'
+                ].join(''),
                 
-                //开关
-                ,_switch: '<em>'+ ((check.checked ? text[0] : text[1]) || '') +'</em><i></i>'
+                // 开关
+                _switch: '<em>'+ ((check.checked ? text[0] : text[1]) || '') +'</em><i></i>'
               };
               return type[skin] || type['checkbox'];
-            }()
-            ,'</div>'].join(''));
+            }(),
+            '</div>'].join(''));
   
             hasRender[0] && hasRender.remove(); //如果已经渲染，则Rerender
             othis.after(reElem);
             events.call(this, reElem, RE_CLASS);
           });
-        }
+        },
         
-        //单选框
-        ,radio: function(){
-          var CLASS = 'layui-form-radio', ICON = ['&#xe643;', '&#xe63f;']
-          ,radios = elemForm.find('input[type=radio]')
+        // 单选框
+        radio: function(){
+          var CLASS = 'layui-form-radio'; // 单选类
+          var ICON = ['&#xe643;', '&#xe63f;']; // icon
+          var radios = elemForm.find('input[type=radio]'); // 获取单选 dom 集合
           
-          ,events = function(reElem){
-            var radio = $(this), ANIM = 'layui-anim-scaleSpring';
+          var events = function(reElem){
+            var radio = $(this);
+            var ANIM = 'layui-anim-scaleSpring';
             
+            // 给替代的dom 添加点击事件
             reElem.on('click', function(){
-              var name = radio[0].name, forms = radio.parents(ELEM);
+              var name = radio[0].name; // 获取radio的name
+              var forms = radio.parents(ELEM);
               var filter = radio.attr('lay-filter'); //获取过滤器
-              var sameRadio = forms.find('input[name='+ name.replace(/(\.|#|\[|\])/g, '\\$1') +']'); //找到相同name的兄弟
+              var sameRadio = forms.find('input[name='+ name.replace(/(\.|#|\[|\])/g, '\\$1') +']'); // 找到相同name的兄弟
               
+              // 如果禁用后续不执行
               if(radio[0].disabled) return;
               
-              layui.each(sameRadio, function(){
+              // 遍历相同name radio
+              layui.each(sameRadio, function(){ // 这里主要的功能为所有相同name的raido移除选中类
                 var next = $(this).next('.'+CLASS);
                 this.checked = false;
                 next.removeClass(CLASS+'ed');
                 next.find('.layui-icon').removeClass(ANIM).html(ICON[1]);
               });
               
+              // 这里主要的功能是为选中的元素添加checked和选中类
               radio[0].checked = true;
               reElem.addClass(CLASS+'ed');
               reElem.find('.layui-icon').addClass(ANIM).html(ICON[0]);
               
+              // 执行模块事件
               layui.event.call(radio[0], MOD_NAME, 'radio('+ filter +')', {
-                elem: radio[0]
-                ,value: radio[0].value
-                ,othis: reElem
+                elem: radio[0],
+                value: radio[0].value,
+                othis: reElem
               });
             });
           };
           
+          // 对在form表单下的所有input[type=radio]遍历
           radios.each(function(index, radio){
-            var othis = $(this), hasRender = othis.next('.' + CLASS), disabled = this.disabled;
+            var othis = $(this);
+            var hasRender = othis.next('.' + CLASS); // 获取是否渲染
+            var disabled = this.disabled; // 获取是否禁用
             
+            // 如果当前input[type=radio]忽略元素美化处理，后续不执行
             if(typeof othis.attr('lay-ignore') === 'string') return othis.show();
             hasRender[0] && hasRender.remove(); //如果已经渲染，则Rerender
             
-            //替代元素
-            var reElem = $(['<div class="layui-unselect '+ CLASS 
-              ,(radio.checked ? (' '+CLASS+'ed') : '') //选中状态
-            ,(disabled ? ' layui-radio-disabled '+DISABLED : '') +'">' //禁用状态
-            ,'<i class="layui-anim layui-icon">'+ ICON[radio.checked ? 0 : 1] +'</i>'
-            ,'<div>'+ function(){
+            // 替代元素
+            var reElem = $(['<div class="layui-unselect '+ CLASS, 
+              (radio.checked ? (' '+CLASS+'ed') : ''), //选中状态
+            (disabled ? ' layui-radio-disabled '+DISABLED : '') +'">', //禁用状态
+            '<i class="layui-anim layui-icon">'+ ICON[radio.checked ? 0 : 1] +'</i>',
+            '<div>'+ function(){
               var title = radio.title || '';
               if(typeof othis.next().attr('lay-radio') === 'string'){
                 title = othis.next().html();
                 //othis.next().remove();
               }
               return title
-            }() +'</div>'
-            ,'</div>'].join(''));
+            }() +'</div>',
+            '</div>'].join(''));
   
             othis.after(reElem);
             events.call(this, reElem);
@@ -661,37 +683,39 @@ layui.define('layer', function(exports){
     
     //表单提交校验
     var submit = function(){
-      var stop = null //验证不通过状态
-      ,verify = form.config.verify //验证规则
-      ,DANGER = 'layui-form-danger' //警示样式
-      ,field = {}  //字段集合
-      ,button = $(this) //当前触发的按钮
-      ,elem = button.parents(ELEM).eq(0) //当前所在表单域
-      ,verifyElem = elem.find('*[lay-verify]') //获取需要校验的元素
-      ,formElem = button.parents('form')[0] //获取当前所在的 form 元素，如果存在的话
-      ,filter = button.attr('lay-filter'); //获取过滤器
-     
-      
-      //开始校验
+      var stop = null; // 验证不通过状态
+      var verify = form.config.verify; // 验证规则
+      var DANGER = 'layui-form-danger'; // 警示样式
+      var field = {};  // 字段集合
+      var button = $(this); // 当前触发的按钮
+      var elem = button.parents(ELEM).eq(0); // 当前所在表单域
+      var verifyElem = elem.find('*[lay-verify]'); // 获取需要校验的元素
+      var formElem = button.parents('form')[0]; // 获取当前所在的 form 元素，如果存在的话
+      var filter = button.attr('lay-filter'); // 获取过滤器
+
+      // 开始校验
       layui.each(verifyElem, function(_, item){
-        var othis = $(this)
-        ,vers = othis.attr('lay-verify').split('|')
-        ,verType = othis.attr('lay-verType') //提示方式
-        ,value = othis.val();
+        var othis = $(this);
+        var vers = othis.attr('lay-verify').split('|');
+        var verType = othis.attr('lay-verType'); // 提示方式
+        var value = othis.val();
+
+        console.log(_, item, vers);
         
-        othis.removeClass(DANGER); //移除警示样式
+        othis.removeClass(DANGER); // 移除警示样式
         
-        //遍历元素绑定的验证规则
+        // 遍历元素绑定的验证规则
         layui.each(vers, function(_, thisVer){
-          var isTrue //是否命中校验
-          ,errorText = '' //错误提示文本
-          ,isFn = typeof verify[thisVer] === 'function';
+          var isTrue; // 是否命中校验
+          var errorText = ''; // 错误提示文本
+          var isFn = typeof verify[thisVer] === 'function'; // 验证规则有函数和数组两种类型所以需要区分
           
-          //匹配验证规则
+          // 匹配验证规则
           if(verify[thisVer]){
-            var isTrue = isFn ? errorText = verify[thisVer](value, item) : !verify[thisVer][0].test(value)
-            //是否属于美化替换后的表单元素
-            ,isForm2Elem = item.tagName.toLowerCase() === 'select' || /^checkbox|radio$/.test(item.type);
+            var isTrue = isFn ? errorText = verify[thisVer](value, item) : !verify[thisVer][0].test(value);
+
+            // 是否属于美化替换后的表单元素
+            var isForm2Elem = item.tagName.toLowerCase() === 'select' || /^checkbox|radio$/.test(item.type);
             
             errorText = errorText || verify[thisVer][1];
             
@@ -699,9 +723,9 @@ layui.define('layer', function(exports){
               errorText = othis.attr('lay-reqText') || errorText;
             }
             
-            //如果是必填项或者非空命中校验，则阻止提交，弹出提示
+            // 如果是必填项或者非空命中校验，则阻止提交，弹出提示
             if(isTrue){
-              //提示层风格
+              // 提示层风格
               if(verType === 'tips'){
                 layer.tips(errorText, function(){
                   if(typeof othis.attr('lay-ignore') !== 'string'){
@@ -714,17 +738,17 @@ layui.define('layer', function(exports){
               } else if(verType === 'alert') {
                 layer.alert(errorText, {title: '提示', shadeClose: true});
               } 
-              //如果返回的为字符或数字，则自动弹出默认提示框；否则由 verify 方法中处理提示
+              // 如果返回的为字符或数字，则自动弹出默认提示框；否则由 verify 方法中处理提示
               else if(/\bstring|number\b/.test(typeof errorText)){ 
                 layer.msg(errorText, {icon: 5, shift: 6});
               }
               
-              //非移动设备自动定位焦点
+              // 非移动设备自动定位焦点
               if(!device.mobile){
                 setTimeout(function(){
                   (isForm2Elem ? othis.next().find('input') : item).focus();
                 }, 7);
-              } else { //移动设备定位
+              } else { // 移动设备定位
                 $dom.scrollTop(function(){
                   try {
                     return (isForm2Elem ? othis.next() : othis).offset().top - 15
@@ -739,19 +763,19 @@ layui.define('layer', function(exports){
             }
           }
         });
-        if(stop) return stop;
+        if(stop) return stop; // 如果有错误后续遍历不执行
       });
       
       if(stop) return false;
       
-      //获取当前表单值
+      // 获取当前表单值
       field = form.getValue(null, elem);
    
-      //返回字段
+      // 返回字段
       return layui.event.call(this, MOD_NAME, 'submit('+ filter +')', {
-        elem: this
-        ,form: formElem
-        ,field: field
+        elem: this,
+        form: formElem,
+        field: field
       });
     };
   
