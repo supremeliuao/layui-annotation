@@ -9,55 +9,83 @@
     <script src="./jquery-3.3.1.js"></script>
 </head>
 <body>
-    <div id="test1" class="demo-transfer"></div>
+    <div id="test1"></div>
+    <button class="layui-btn" lay-active="kinghiee">点击</button>
     <script src="./src/layui.js"></script>
     <script>
-        layui.use(['transfer', 'layer', 'util'], function(){
-          var $ = layui.$
-          ,transfer = layui.transfer
-          ,layer = layui.layer
-          ,util = layui.util;
-          
-          //模拟数据
-          var data1 = [
-            {"value": "1", "title": "李白", checked: true}
-            ,{"value": "2", "title": "杜甫", checked: true}
-            ,{"value": "3", "title": "苏轼"}
-            ,{"value": "4", "title": "李清照"}
-            ,{"value": "5", "title": "鲁迅", "disabled": true}
-            ,{"value": "6", "title": "巴金", checked: true}
-            ,{"value": "7", "title": "冰心", checked: true}
-            ,{"value": "8", "title": "矛盾", checked: true}
-            ,{"value": "9", "title": "贤心"}
-          ]
-          
-          ,data2 = [
-            {"value": "1", "title": "瓦罐汤"}
-            ,{"value": "2", "title": "油酥饼"}
-            ,{"value": "3", "title": "炸酱面"}
-            ,{"value": "4", "title": "串串香", "disabled": true}
-            ,{"value": "5", "title": "豆腐脑"}
-            ,{"value": "6", "title": "驴打滚"}
-            ,{"value": "7", "title": "北京烤鸭"}
-            ,{"value": "8", "title": "烤冷面"}
-            ,{"value": "9", "title": "毛血旺", "disabled": true}
-            ,{"value": "10", "title": "肉夹馍"}
-            ,{"value": "11", "title": "臊子面"}
-            ,{"value": "12", "title": "凉皮"}
-            ,{"value": "13", "title": "羊肉泡馍"}
-            ,{"value": "14", "title": "冰糖葫芦", "disabled": true}
-            ,{"value": "15", "title": "狼牙土豆"}
-          ]
+        layui.use(['tree', 'util'], function(){
+          var tree = layui.tree;
+          var util = layui.util;
         
-          //基础效果
-          transfer.render({
-            elem: '#test1',
-            data: data1,
-            text: {
-              none: '无数据' //没有数据时的文案
-              ,searchNone: '无匹配数据' //搜索无匹配数据时的文案
-            }   
-            // value: {"value": "1", "title": "李白"}
+          //渲染
+         tree.render({
+            elem: '#test1',  //绑定元素
+            id:'one',
+            // showLine: false,
+            accordion: true,
+            showCheckbox: true,
+            isJump: true,
+            edit: true,
+            data: [
+              {
+                title: '江西', //一级菜单
+                spread: true,
+                id:'11',
+                href:'https://www.baidu.com/?tn=06074089_21_pg',
+                children: [
+                  {
+                    title: '南昌', //二级菜单
+                    checked: true,
+                    id:'22',
+                    children: [
+                      {
+                        title: '高新区' //三级菜单
+                      }
+                    ]
+                  },
+                  {
+                    title: '南22昌', //二级菜单
+                    children: [
+                      {
+                        title: '高新22区', //三级菜单
+                        children: [
+                          {
+                            title: '你好'
+                          }
+                        ]
+                      },
+                      {
+                        title: '高新33区', //三级菜单
+                        children: [
+                          {
+                            title: '高新22区' //三级菜单
+                          },
+                          {
+                            title: '高新33区' //三级菜单
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                title: '陕西', //一级菜单
+                children: [
+                  {
+                    title: '西安' //二级菜单
+                  }
+                ]
+              }
+            ]
+          });
+
+          util.event('lay-active', {
+            kinghiee:function(othis){
+              tree.reload('one', {
+                data1:[]
+              })
+            }
           })
         });
     </script>
