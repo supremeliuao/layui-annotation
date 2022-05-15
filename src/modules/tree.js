@@ -1,110 +1,139 @@
 layui.define('form', function(exports){
     "use strict";
     
-    var $ = layui.$
-    ,form = layui.form
-    ,layer = layui.layer
+    var $ = layui.$;
+    var form = layui.form;
+    var layer = layui.layer;
     
-    //模块名
-    ,MOD_NAME = 'tree'
+    // 模块名
+    var MOD_NAME = 'tree';
   
-    //外部接口
-    ,tree = {
-      config: {}
-      ,index: layui[MOD_NAME] ? (layui[MOD_NAME].index + 10000) : 0
+    // 外部接口
+    var tree = {
+      config: {},
+      index: layui[MOD_NAME] ? (layui[MOD_NAME].index + 10000) : 0,
   
-      //设置全局项
-      ,set: function(options){
+      // 设置全局项
+      set: function(options){
         var that = this;
         that.config = $.extend({}, that.config, options);
         return that;
-      }
+      },
       
-      //事件
-      ,on: function(events, callback){
+      // 事件
+      on: function(events, callback){
         return layui.onevent.call(this, MOD_NAME, events, callback);
       }
     }
   
-    //操作当前实例
-    ,thisModule = function(){
-      var that = this
-      ,options = that.config
-      ,id = options.id || that.index;
+    // 操作当前实例
+    var thisModule = function(){
+      var that = this;
+      var options = that.config
+      var id = options.id || that.index;
       
       thisModule.that[id] = that; //记录当前实例对象
       thisModule.config[id] = options; //记录当前实例配置项
       
       return {
-        config: options
-        //重置实例
-        ,reload: function(options){
+        config: options,
+        // 重置实例
+        reload: function(options){
           that.reload.call(that, options);
-        }
-        ,getChecked: function(){
+        },
+        getChecked: function(){
           return that.getChecked.call(that);
-        }
-        ,setChecked: function(id){//设置值
+        },
+        setChecked: function(id){// 设置值
           return that.setChecked.call(that, id);
         }
       }
     }
     
-    //获取当前实例配置项
-    ,getThisModuleConfig = function(id){
+    // 获取当前实例配置项
+    var getThisModuleConfig = function(id){
       var config = thisModule.config[id];
       if(!config) hint.error('The ID option was not found in the '+ MOD_NAME +' instance');
       return config || null;
     }
   
-    //字符常量
-    ,SHOW = 'layui-show', HIDE = 'layui-hide', NONE = 'layui-none', DISABLED = 'layui-disabled'
+    // 字符常量
+    var SHOW = 'layui-show';
+    var HIDE = 'layui-hide';
+    var NONE = 'layui-none';
+    var DISABLED = 'layui-disabled';
     
-    ,ELEM_VIEW = 'layui-tree', ELEM_SET = 'layui-tree-set', ICON_CLICK = 'layui-tree-iconClick'
-    ,ICON_ADD = 'layui-icon-addition', ICON_SUB = 'layui-icon-subtraction', ELEM_ENTRY = 'layui-tree-entry', ELEM_MAIN = 'layui-tree-main', ELEM_TEXT = 'layui-tree-txt', ELEM_PACK = 'layui-tree-pack', ELEM_SPREAD = 'layui-tree-spread'
-    ,ELEM_LINE_SHORT = 'layui-tree-setLineShort', ELEM_SHOW = 'layui-tree-showLine', ELEM_EXTEND = 'layui-tree-lineExtend'
+    var ELEM_VIEW = 'layui-tree';
+    var ELEM_SET = 'layui-tree-set';
+    var ICON_CLICK = 'layui-tree-iconClick';
+    var ICON_ADD = 'layui-icon-addition';
+    var ICON_SUB = 'layui-icon-subtraction';
+    var ELEM_ENTRY = 'layui-tree-entry';
+    var ELEM_MAIN = 'layui-tree-main';
+    var ELEM_TEXT = 'layui-tree-txt';
+    var ELEM_PACK = 'layui-tree-pack';
+    var ELEM_SPREAD = 'layui-tree-spread';
+    var ELEM_LINE_SHORT = 'layui-tree-setLineShort';
+    var ELEM_SHOW = 'layui-tree-showLine';
+    var ELEM_EXTEND = 'layui-tree-lineExtend';
    
-    //构造器
-    ,Class = function(options){
+    /**
+     * 构造器
+     * options 对象包含一下属性值
+     * 参数选项          类型                默认值                       说明
+     * elem             String/Object       -                            指向容器选择器
+     * data             Array                                            数据源
+     * id               String              -                            设定实例唯一索引，用于基础方法传参使用
+     * showCheckbox     Boolean             false                        是否显示复选框
+     * edit             Boolean/Array       ['update', 'del']            是否开启节点的操作图标。默认 false。若为 true，则默认显示“改删”图标若为 数组，则可自由配置操作图标的显示状态和顺序，目前支持的操作图标有：add、update、del，如：edit: ['add', 'update', 'del']
+     * accordion        Boolean             false                        是否开启手风琴模式，默认 false
+     * onlyIconControl  Boolean             false                        是否仅允许节点左侧图标控制展开收缩。默认 false（即点击节点本身也可控制）。若为 true，则只能通过节点左侧图标来展开收缩
+     * isJump           Boolean             false                        是否允许点击节点时弹出新窗口跳转。默认 false，若开启，需在节点数据中设定 link 参数（值为 url 格式）
+     * showLine         Boolean             true                         是否开启连接线。默认 true，若设为 false，则节点左侧出现三角图标。
+     * text             Object              -                            自定义各类默认文本              
+     */
+    var Class = function(options){
       var that = this;
       that.index = ++tree.index;
-      that.config = $.extend({}, that.config, tree.config, options);
+      that.config = $.extend({}, that.config, tree.config, options); 
       that.render();
     };
   
-    //默认配置
+    // 默认配置
     Class.prototype.config = {
-      data: []  //数据
+      data: [],  // 数据
       
-      ,showCheckbox: false  //是否显示复选框
-      ,showLine: true  //是否开启连接线
-      ,accordion: false  //是否开启手风琴模式
-      ,onlyIconControl: false  //是否仅允许节点左侧图标控制展开收缩
-      ,isJump: false  //是否允许点击节点时弹出新窗口跳转
-      ,edit: false  //是否开启节点的操作图标
+      showCheckbox: false,  // 是否显示复选框
+      showLine: true,  // 是否开启连接线
+      accordion: false,  // 是否开启手风琴模式
+      onlyIconControl: false,  // 是否仅允许节点左侧图标控制展开收缩
+      isJump: false,  // 是否允许点击节点时弹出新窗口跳转
+      edit: false,  // 是否开启节点的操作图标
       
-      ,text: {
-        defaultNodeName: '未命名' //节点默认名称
-        ,none: '无数据'  //数据为空时的文本提示
+      text: {
+        defaultNodeName: '未命名' // 节点默认名称
+        ,none: '无数据'  // 数据为空时的文本提示
       }
     };
     
-    //重载实例
+    // 重载实例
     Class.prototype.reload = function(options){
       var that = this;
       
+      // 对options遍历
       layui.each(options, function(key, item){
+        // 如果 item 为数组，则删除原来配置中key对应的数据
         if(layui._typeof(item) === 'array') delete that.config[key];
       });
       
       that.config = $.extend(true, {}, that.config, options);
-      that.render();
+      that.render(); // 更新渲染
     };
   
-    //主体渲染
+    // 主体渲染
     Class.prototype.render = function(){
-      var that = this
-      ,options = that.config;
+      var that = this;
+      var options = that.config; // 获取配置
       
       that.checkids = [];
   
@@ -152,7 +181,7 @@ layui.define('form', function(exports){
       that.events();
     };
     
-    //渲染表单
+    // 渲染表单
     Class.prototype.renderForm = function(type){
       form.render(type, 'LAY-tree-'+ this.index);
     };
@@ -775,35 +804,36 @@ layui.define('form', function(exports){
       });
     };
   
-    //记录所有实例
-    thisModule.that = {}; //记录所有实例对象
-    thisModule.config = {}; //记录所有实例配置项
+    // 记录所有实例
+    thisModule.that = {}; // 记录所有实例对象
+    thisModule.config = {}; // 记录所有实例配置项
     
-    //重载实例
+    // 重载实例
     tree.reload = function(id, options){
-      var that = thisModule.that[id];
-      that.reload(options);
+      var that = thisModule.that[id]; // 获取对应实例
+      that.reload(options); // 重载实例
       
       return thisModule.call(that);
     };
     
-    //获得选中的节点数据
+    // 获得选中的节点数据
     tree.getChecked = function(id){
       var that = thisModule.that[id];
       return that.getChecked();
     };
     
-    //设置选中节点
+    // 设置选中节点
     tree.setChecked = function(id, checkedId){
       var that = thisModule.that[id];
       return that.setChecked(checkedId);
     };
       
-    //核心入口
+    // 核心入口
     tree.render = function(options){
       var inst = new Class(options);
       return thisModule.call(inst);
     };
-  
+    
+    // 导出模块
     exports(MOD_NAME, tree);
 })
