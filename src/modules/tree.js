@@ -136,9 +136,10 @@ layui.define('form', function(exports){
       var options = that.config; // 获取配置
       
       that.checkids = [];
-  
+      
+      // tree 最外层 dom  
       var temp = $('<div class="layui-tree'+ (options.showCheckbox ? " layui-form" : "") + (options.showLine ? " layui-tree-line" : "") +'" lay-filter="LAY-tree-'+ that.index +'"></div>');
-      that.tree(temp);
+      that.tree(temp); // 节点分析
   
       var othis = options.elem = $(options.elem);
       if(!othis[0]) return;
@@ -188,49 +189,49 @@ layui.define('form', function(exports){
   
     //节点解析
     Class.prototype.tree = function(elem, children){
-      var that = this
-      ,options = that.config
-      ,data = children || options.data;
+      var that = this;
+      var options = that.config; // 获取配置
+      var data = children || options.data; // 默认获取 options中data
   
-      //遍历数据
+      // 遍历数据
       layui.each(data, function(index, item){
-        var hasChild = item.children && item.children.length > 0
-        ,packDiv = $('<div class="layui-tree-pack" '+ (item.spread ? 'style="display: block;"' : '') +'></div>')
-        ,entryDiv = $(['<div data-id="'+ item.id +'" class="layui-tree-set'+ (item.spread ? " layui-tree-spread" : "") + (item.checked ? " layui-tree-checkedFirst" : "") +'">'
-          ,'<div class="layui-tree-entry">'
-            ,'<div class="layui-tree-main">'
-              //箭头
-              ,function(){
-                if(options.showLine){
-                  if(hasChild){
+        var hasChild = item.children && item.children.length > 0; // 判断是否有 children
+        var packDiv = $('<div class="layui-tree-pack" '+ (item.spread ? 'style="display: block;"' : '') +'></div>'); // spread 表示节点是否展开，默认不展开
+        var entryDiv = $(['<div data-id="'+ item.id +'" class="layui-tree-set'+ (item.spread ? " layui-tree-spread" : "") + (item.checked ? " layui-tree-checkedFirst" : "") +'">', // id: 节点唯一索引值，用于对指定节点进行各类操作
+          '<div class="layui-tree-entry">',
+            '<div class="layui-tree-main">',
+              // 箭头
+              function(){ // 立即执行函数
+                if(options.showLine){ // 判断是否存在开启连接线
+                  if(hasChild){ // 根据有没有子节点显示不同连接线
                     return '<span class="layui-tree-iconClick layui-tree-icon"><i class="layui-icon '+ (item.spread ? "layui-icon-subtraction" : "layui-icon-addition") +'"></i></span>';
                   }else{
                     return '<span class="layui-tree-iconClick"><i class="layui-icon layui-icon-file"></i></span>';
                   };
-                }else{
+                }else{ // 默认为三角图标
                   return '<span class="layui-tree-iconClick"><i class="layui-tree-iconArrow '+ (hasChild ? "": HIDE) +'"></i></span>';
                 };
-              }()
+              }(),
               
-              //复选框
-              ,function(){
+              // 复选框
+              function(){
                 return options.showCheckbox ? '<input type="checkbox" name="'+ (item.field || ('layuiTreeCheck_'+ item.id)) +'" same="layuiTreeCheck" lay-skin="primary" '+ (item.disabled ? "disabled" : "") +' value="'+ item.id +'">' : '';
-              }()
+              }(),
               
-              //节点
-              ,function(){
-                if(options.isJump && item.href){
+              // 节点
+              function(){
+                if(options.isJump && item.href){ // 如果允许点击节点时弹出新窗口跳转并且当前节点存在href，则生成带有a标签
                   return '<a href="'+ item.href +'" target="_blank" class="'+ ELEM_TEXT +'">'+ (item.title || item.label || options.text.defaultNodeName) +'</a>';
                 }else{
                   return '<span class="'+ ELEM_TEXT + (item.disabled ? ' '+ DISABLED : '') +'">'+ (item.title || item.label || options.text.defaultNodeName) +'</span>';
                 }
-              }()
-        ,'</div>'
+              }(),
+        '</div>',
         
-        //节点操作图标
-        ,function(){
-          if(!options.edit) return '';
-          
+        // 节点操作图标
+        function(){
+          if(!options.edit) return ''; // 没有开启节点的操作，后续不执行
+
           var editIcon = {
             add: '<i class="layui-icon layui-icon-add-1"  data-type="add"></i>'
             ,update: '<i class="layui-icon layui-icon-edit" data-type="update"></i>'
@@ -247,8 +248,10 @@ layui.define('form', function(exports){
             });
             return arr.join('') + '</div>';
           }
-        }()
-        ,'</div></div>'].join(''));
+        }(),
+        '</div></div>'].join(''));
+
+        console.log(entryDiv);
   
         //如果有子节点，则递归继续生成树
         if(hasChild){

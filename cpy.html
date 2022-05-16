@@ -20,24 +20,37 @@
           //渲染
          tree.render({
             elem: '#test1',  //绑定元素
-            showLine: false,
             id:'one',
-            data: [{
-              title: '江西' //一级菜单
-              ,children: [{
-                title: '南昌' //二级菜单
-                ,children: [
+            showLine: false,
+            showCheckbox: true,
+            isJump: true,
+            edit: true,
+            data: [
+              {
+                title: '江西', //一级菜单
+                spread: true,
+                checked: true,
+                href:'https://www.baidu.com/?tn=06074089_21_pg',
+                children: [
                   {
-                    title: '高新区' //三级菜单
+                    title: '南昌', //二级菜单
+                    children: [
+                      {
+                        title: '高新区' //三级菜单
+                      }
+                    ]
                   }
                 ]
-              }]
-            },{
-              title: '陕西' //一级菜单
-              ,children: [{
-                title: '西安' //二级菜单
-              }]
-            }]
+              },
+              {
+                title: '陕西', //一级菜单
+                children: [
+                  {
+                    title: '西安' //二级菜单
+                  }
+                ]
+              }
+            ]
           });
 
           util.event('lay-active', {
