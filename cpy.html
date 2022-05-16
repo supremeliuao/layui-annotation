@@ -22,6 +22,7 @@
             elem: '#test1',  //绑定元素
             id:'one',
             showLine: false,
+            accordion: true,
             showCheckbox: true,
             isJump: true,
             edit: true,
@@ -37,6 +38,30 @@
                     children: [
                       {
                         title: '高新区' //三级菜单
+                      }
+                    ]
+                  },
+                  {
+                    title: '南22昌', //二级菜单
+                    children: [
+                      {
+                        title: '高新22区', //三级菜单
+                        children: [
+                          {
+                            title: '你好'
+                          }
+                        ]
+                      },
+                      {
+                        title: '高新33区', //三级菜单
+                        children: [
+                          {
+                            title: '高新22区' //三级菜单
+                          },
+                          {
+                            title: '高新33区' //三级菜单
+                          }
+                        ]
                       }
                     ]
                   }

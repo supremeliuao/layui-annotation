@@ -233,27 +233,26 @@ layui.define('form', function(exports){
           if(!options.edit) return ''; // 没有开启节点的操作，后续不执行
 
           var editIcon = {
-            add: '<i class="layui-icon layui-icon-add-1"  data-type="add"></i>'
-            ,update: '<i class="layui-icon layui-icon-edit" data-type="update"></i>'
-            ,del: '<i class="layui-icon layui-icon-delete" data-type="del"></i>'
-          }, arr = ['<div class="layui-btn-group layui-tree-btnGroup">'];
+            add: '<i class="layui-icon layui-icon-add-1"  data-type="add"></i>', // 添加的icon
+            update: '<i class="layui-icon layui-icon-edit" data-type="update"></i>', // update icon
+            del: '<i class="layui-icon layui-icon-delete" data-type="del"></i>', // 删除的 icon
+          };
+          var arr = ['<div class="layui-btn-group layui-tree-btnGroup">'];
           
-          if(options.edit === true){
-            options.edit = ['update', 'del']
+          if(options.edit === true){ // 若为 true，则默认显示“改删”图标
+            options.edit = ['update', 'del'];
           }
           
           if(typeof options.edit === 'object'){
-            layui.each(options.edit, function(i, val){
-              arr.push(editIcon[val] || '')
+            layui.each(options.edit, function(i, val){ // 选择不同功能
+              arr.push(editIcon[val] || ''); 
             });
             return arr.join('') + '</div>';
           }
         }(),
         '</div></div>'].join(''));
-
-        console.log(entryDiv);
   
-        //如果有子节点，则递归继续生成树
+        // 如果有子节点，则递归继续生成树
         if(hasChild){
           entryDiv.append(packDiv);
           that.tree(packDiv, item.children);
@@ -261,90 +260,92 @@ layui.define('form', function(exports){
   
         elem.append(entryDiv);
         
-        //若有前置节点，前置节点加连接线
+        // 若有前置节点，前置节点加连接线
         if(entryDiv.prev('.'+ELEM_SET)[0]){
           entryDiv.prev().children('.layui-tree-pack').addClass('layui-tree-showLine');
         };
         
-        //若无子节点，则父节点加延伸线
+        // 若无子节点，则父节点加延伸线
         if(!hasChild){
           entryDiv.parent('.layui-tree-pack').addClass('layui-tree-lineExtend');
         };
-  
-        //展开节点操作
-        that.spread(entryDiv, item);
         
-        //选择框
+        // 展开节点操作
+        that.spread(entryDiv, item); // 一个完整节点单元传入
+        
+        // 选择框
         if(options.showCheckbox){
           item.checked && that.checkids.push(item.id);
           that.checkClick(entryDiv, item);
         }
         
-        //操作节点
+        // 操作节点
         options.edit && that.operate(entryDiv, item);
         
       });
     };
   
-    //展开节点
+    // 展开节点
     Class.prototype.spread = function(elem, item){
-      var that = this
-      ,options = that.config
-      ,entry = elem.children('.'+ELEM_ENTRY)
-      ,elemMain = entry.children('.'+ ELEM_MAIN)
-      ,elemIcon = entry.find('.'+ ICON_CLICK)
-      ,elemText = entry.find('.'+ ELEM_TEXT)
-      ,touchOpen = options.onlyIconControl ? elemIcon : elemMain //判断展开通过节点还是箭头图标
-      ,state = '';
-      
-      //展开收缩
+      var that = this;
+      var options = that.config;
+      var entry = elem.children('.'+ELEM_ENTRY); // 获取elem的直接子元素 layui-tree-entry 类 dom, 注意使用的是children而children() 方法返回被选元素的所有直接子元素。
+      var elemMain = entry.children('.'+ ELEM_MAIN); // 获取 layui-tree-main 类 dom
+      var elemIcon = entry.find('.'+ ICON_CLICK); // 获取 layui-tree-iconClick 类 dom, 因为entry是通过查找直接子元素的，所以确保了使用find方法查询元素的唯一性
+      var elemText = entry.find('.'+ ELEM_TEXT); // 获取 layui-tree-txt 类 dom
+      var touchOpen = options.onlyIconControl ? elemIcon : elemMain; // 判断展开通过节点还是箭头图标
+      var state = '';
+
+      // 展开收缩
       touchOpen.on('click', function(e){
-        var packCont = elem.children('.'+ELEM_PACK)
-        ,iconClick = touchOpen.children('.layui-icon')[0] ? touchOpen.children('.layui-icon') : touchOpen.find('.layui-tree-icon').children('.layui-icon');
-  
-        //若没有子节点
+        var packCont = elem.children('.'+ELEM_PACK); // 获取elem的直接子元素 layui-tree-pack 类 dom
+
+        // 判断touchOpen直接子元素有没有icon，如果没有则在touchOpen下查找所有子元素并获取icon dom。只对连接线模式下点击iconClick 有值
+        var iconClick = touchOpen.children('.layui-icon')[0] ? touchOpen.children('.layui-icon') : touchOpen.find('.layui-tree-icon').children('.layui-icon');
+         
+        // 若没有子节点
         if(!packCont[0]){
           state = 'normal';
         }else{
-          if(elem.hasClass(ELEM_SPREAD)){
-            elem.removeClass(ELEM_SPREAD);
-            packCont.slideUp(200);
-            iconClick.removeClass(ICON_SUB).addClass(ICON_ADD); 
-          }else{
-            elem.addClass(ELEM_SPREAD);
-            packCont.slideDown(200);
-            iconClick.addClass(ICON_SUB).removeClass(ICON_ADD);
+          if(elem.hasClass(ELEM_SPREAD)){ // 当前 elem 处于展开状态
+            elem.removeClass(ELEM_SPREAD); // 移除展开的类
+            packCont.slideUp(200); // 添加收起动画
+            iconClick.removeClass(ICON_SUB).addClass(ICON_ADD); // 先移除 layui-icon-subtraction类后添加layui-icon-addition类
+          }else{ // 当前 elem 处于闭合状态
+            elem.addClass(ELEM_SPREAD); // 添加展开类
+            packCont.slideDown(200); // 添加下拉动画
+            iconClick.addClass(ICON_SUB).removeClass(ICON_ADD); // 添加layui-icon-subtraction类移除layui-icon-addition类
   
-            //是否手风琴
-            if(options.accordion){
-              var sibls = elem.siblings('.'+ELEM_SET);
-              sibls.removeClass(ELEM_SPREAD);
-              sibls.children('.'+ELEM_PACK).slideUp(200);
-              sibls.find('.layui-tree-icon').children('.layui-icon').removeClass(ICON_SUB).addClass(ICON_ADD);
+            // 是否手风琴
+            if(options.accordion){ // 处于手风琴状态时
+              var sibls = elem.siblings('.'+ELEM_SET); // 获取elem所有同级layui-tree-set dom
+              sibls.removeClass(ELEM_SPREAD); // 对同级layui-tree-set移除展开类
+              sibls.children('.'+ELEM_PACK).slideUp(200); // 对同级下的直接子layui-tree-pack添加收起动画
+              sibls.find('.layui-tree-icon').children('.layui-icon').removeClass(ICON_SUB).addClass(ICON_ADD); // 把减号变为加号
             };
           };
         };
       });
       
-      //点击回调
+      // 给文本类添加点击回调
       elemText.on('click', function(){
-        var othis = $(this);
-        
-        //判断是否禁用状态
+        var othis = $(this); // 获取当前点击的dom
+
+        // 判断是否禁用状态, 如果禁用后续不执行
         if(othis.hasClass(DISABLED)) return;
         
-        //判断展开收缩状态
-        if(elem.hasClass(ELEM_SPREAD)){
-          state = options.onlyIconControl ? 'open' : 'close';
+        // 判断展开收缩状态
+        if(elem.hasClass(ELEM_SPREAD)){ // 处于张开状态时
+          state = options.onlyIconControl ? 'open' : 'close'; // 如果onlyIconControl为true则为open
         } else {
           state = options.onlyIconControl ? 'close' : 'open';
         }
         
-        //点击产生的回调
+        // 点击产生的回调。判断用户是否设置了节点点击回调
         options.click && options.click({
-          elem: elem
-          ,state: state
-          ,data: item
+          elem: elem, // 当前节点元素
+          state: state, // 当前节点的展开状态：open、close、normal
+          data: item // 当前点击的节点数据
         });
       });
     };
