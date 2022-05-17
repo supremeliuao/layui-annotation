@@ -272,10 +272,10 @@ layui.define('form', function(exports){
         
         // 展开节点操作
         that.spread(entryDiv, item); // 一个完整节点单元传入
-        
-        // 选择框
+
+        // 用户设置了显示复选框
         if(options.showCheckbox){
-          item.checked && that.checkids.push(item.id);
+          item.checked && that.checkids.push(item.id); // 当前item被选中就把当前id推入
           that.checkClick(entryDiv, item);
         }
         
@@ -350,103 +350,105 @@ layui.define('form', function(exports){
       });
     };
     
-    //计算复选框选中状态
+    // 计算复选框选中状态
     Class.prototype.setCheckbox = function(elem, item, elemCheckbox){
-      var that = this
-      ,options = that.config
-      ,checked = elemCheckbox.prop('checked');
+      var that = this;
+      var options = that.config;
+      var checked = elemCheckbox.prop('checked'); // 获取 input checked值
       
+      // 当前input 复选框处于禁止状态，后续不执行
       if(elemCheckbox.prop('disabled')) return;
-  
-      //同步子节点选中状态
-      if(typeof item.children === 'object' || elem.find('.'+ELEM_PACK)[0]){
-        var childs = elem.find('.'+ ELEM_PACK).find('input[same="layuiTreeCheck"]');
+    
+      // 同步子节点选中状态
+      if(typeof item.children === 'object' || elem.find('.'+ELEM_PACK)[0]){ // 如果 item有子元素或者elem下有layui-tree-pack类，则执行下面
+        var childs = elem.find('.'+ ELEM_PACK).find('input[same="layuiTreeCheck"]'); // 获取所有layui-tree-pack类下的复选框
         childs.each(function(){
-          if(this.disabled) return; //不可点击则跳过
+          if(this.disabled) return; // 不可点击则跳过
           this.checked = checked;
         });
       };
-  
-      //同步父节点选中状态
+
+      // 同步父节点选中状态
       var setParentsChecked = function(thisNodeElem){
-        //若无父节点，则终止递归
-        if(!thisNodeElem.parents('.'+ ELEM_SET)[0]) return;
+        // 若无父节点，则终止递归
+        if(!thisNodeElem.parents('.'+ ELEM_SET)[0]) return; // ELEM_SET:layui-tree-set 类
+
+        console.log('11');
+        var state;
+        var parentPack = thisNodeElem.parent('.'+ ELEM_PACK); // 获取直接父级layui-tree-pack类
+        var parentNodeElem = parentPack.parent(); // 获取layui-tree-pack类的直接父级layui-tree-set 类
+        var parentCheckbox =  parentPack.prev().find('input[same="layuiTreeCheck"]'); // 获取复选框
   
-        var state
-        ,parentPack = thisNodeElem.parent('.'+ ELEM_PACK)
-        ,parentNodeElem = parentPack.parent()
-        ,parentCheckbox =  parentPack.prev().find('input[same="layuiTreeCheck"]');
-  
-        //如果子节点有任意一条选中，则父节点为选中状态
+        // 如果子节点有任意一条选中，则父节点为选中状态
         if(checked){
           parentCheckbox.prop('checked', checked);
-        } else { //如果当前节点取消选中，则根据计算“兄弟和子孙”节点选中状态，来同步父节点选中状态
+        } else { // 如果当前节点取消选中，则根据计算“兄弟和子孙”节点选中状态，来同步父节点选中状态
           parentPack.find('input[same="layuiTreeCheck"]').each(function(){
             if(this.checked){
               state = true;
             }
           });
           
-          //如果兄弟子孙节点全部未选中，则父节点也应为非选中状态
+          // 如果兄弟子孙节点全部未选中，则父节点也应为非选中状态
           state || parentCheckbox.prop('checked', false);
         }
         
-        //向父节点递归
+        // 向父节点递归
         setParentsChecked(parentNodeElem);
       };
       
       setParentsChecked(elem);
   
-      that.renderForm('checkbox');
+      that.renderForm('checkbox'); // 更新渲染
     };
     
-    //复选框选择
+    // 复选框选择
     Class.prototype.checkClick = function(elem, item){
-      var that = this
-      ,options = that.config
-      ,entry = elem.children('.'+ ELEM_ENTRY)
-      ,elemMain = entry.children('.'+ ELEM_MAIN);
+      var that = this;
+      var options = that.config;
+      var entry = elem.children('.'+ ELEM_ENTRY); // 获取elem的直接子元素 layui-tree-entry 类 dom,
+      var elemMain = entry.children('.'+ ELEM_MAIN); // 获取entry直接子元素 layui-tree-main 类 dom
       
-      
-      
-      //点击复选框
+      // 复选框添加点击事件
       elemMain.on('click', 'input[same="layuiTreeCheck"]+', function(e){
-        layui.stope(e); //阻止点击节点事件
-  
-        var elemCheckbox = $(this).prev()
-        ,checked = elemCheckbox.prop('checked');
+        layui.stope(e); // 阻止点击节点事件
         
+        var elemCheckbox = $(this).prev(); // 获取 input dom
+        var checked = elemCheckbox.prop('checked'); // 获取 input checked值
+        
+        // 当前input 复选框处于禁止状态，后续不执行
         if(elemCheckbox.prop('disabled')) return;
         
         that.setCheckbox(elem, item, elemCheckbox);
   
-        //复选框点击产生的回调
+        // 复选框点击产生的回调
         options.oncheck && options.oncheck({
-          elem: elem
-          ,checked: checked
-          ,data: item
+          elem: elem,// 当前节点元素
+          checked: checked, // 当前节点的展开状态：open、close、normal
+          data: item // 当前点击的节点数据
         });
       });
     };
   
-    //节点操作
+    // 节点操作
     Class.prototype.operate = function(elem, item){
-      var that = this
-      ,options = that.config
-      ,entry = elem.children('.'+ ELEM_ENTRY)
-      ,elemMain = entry.children('.'+ ELEM_MAIN);
-  
+      var that = this;
+      var options = that.config;
+      var entry = elem.children('.'+ ELEM_ENTRY); // 获取elem的直接子元素 layui-tree-entry 类 dom,
+      var elemMain = entry.children('.'+ ELEM_MAIN); // 获取entry直接子元素 layui-tree-main 类 dom
+      
+      // 给entry下直接layui-tree-btnGroup类添加click事件
       entry.children('.layui-tree-btnGroup').on('click', '.layui-icon', function(e){
-        layui.stope(e);  //阻止节点操作
+        layui.stope(e);  // 阻止节点操作
   
-        var type = $(this).data("type")
-        ,packCont = elem.children('.'+ELEM_PACK)
-        ,returnObj = {
-          data: item
-          ,type: type
-          ,elem:elem
+        var type = $(this).data("type"); // 获取type:add、update、del
+        var packCont = elem.children('.'+ELEM_PACK);
+        var returnObj = {
+          data: item,
+          type: type,
+          elem:elem
         };
-        //增加
+        // 增加
         if(type == 'add'){
           //若节点本身无子节点
           if(!packCont[0]){
