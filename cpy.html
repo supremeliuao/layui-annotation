@@ -7,87 +7,105 @@
     <title>Document</title>
     <link rel="stylesheet" href="./src/css/layui.css">
     <script src="./jquery-3.3.1.js"></script>
+    <script src="./src/layui.js"></script>
 </head>
 <body>
-    <div id="test1"></div>
-    <button class="layui-btn" lay-active="kinghiee">点击</button>
-    <script src="./src/layui.js"></script>
-    <script>
-        layui.use(['tree', 'util'], function(){
-          var tree = layui.tree;
-          var util = layui.util;
-        
-          //渲染
-         tree.render({
-            elem: '#test1',  //绑定元素
-            id:'one',
-            // showLine: false,
-            accordion: true,
-            showCheckbox: true,
-            isJump: true,
-            edit: true,
-            data: [
+  <div class="layui-btn-container">
+    <button class="layui-btn demo1">
+      下拉菜单
+      <i class="layui-icon layui-icon-down layui-font-12"></i>
+    </button>
+    <button class="layui-btn layui-btn-primary demo1">
+      下拉菜单
+      <i class="layui-icon layui-icon-down layui-font-12"></i>
+    </button>
+  </div>
+  <script>
+    layui.use(['dropdown', 'util', 'layer'], function(){
+      var dropdown = layui.dropdown
+      ,util = layui.util
+      ,layer = layui.layer
+      ,$ = layui.jquery;
+      
+      //初演示
+      dropdown.render({
+        elem: '.demo1',
+        data: [
+          {
+            title: 'menu item11',
+            id: 100
+          },
+          {
+            title: 'menu item22',
+            id: 101
+          },
+          {
+            title: 'menu item33',
+            id: 102
+          },
+          {
+            title: 'menu item 3-3',
+            id: 111111,
+            type: 'group',
+            child: [
               {
-                title: '江西', //一级菜单
-                spread: true,
-                id:'11',
-                href:'https://www.baidu.com/?tn=06074089_21_pg',
-                children: [
+                title: 'menu item 3-3-1',
+                id: 22
+              },
+              {
+                title: 'menu item 3-3-2',
+                id: 222,
+                child: [
                   {
-                    title: '南昌', //二级菜单
-                    checked: true,
-                    id:'22',
-                    children: [
-                      {
-                        title: '高新区' //三级菜单
-                      }
-                    ]
+                    title: 'menu item 3-3-2-1',
+                    id: 2222
                   },
                   {
-                    title: '南22昌', //二级菜单
-                    children: [
-                      {
-                        title: '高新22区', //三级菜单
-                        children: [
-                          {
-                            title: '你好'
-                          }
-                        ]
-                      },
-                      {
-                        title: '高新33区', //三级菜单
-                        children: [
-                          {
-                            title: '高新22区' //三级菜单
-                          },
-                          {
-                            title: '高新33区' //三级菜单
-                          }
-                        ]
-                      }
-                    ]
+                    title: 'menu item 3-3-2-2',
+                    id: 22222
+                  },
+                  {
+                    title: 'menu item 3-3-2-3',
+                    id: 2222222
                   }
                 ]
               },
-              {
-                title: '陕西', //一级菜单
-                children: [
-                  {
-                    title: '西安' //二级菜单
-                  }
-                ]
-              }
-            ]
-          });
-
-          util.event('lay-active', {
-            kinghiee:function(othis){
-              tree.reload('one', {
-                data1:[]
-              })
-            }
-          })
-        });
-    </script>
+            ],
+          }
+        ]
+        ,click: function(obj){
+          layer.tips('点击了：'+ obj.title, this.elem, {tips: [1, '#5FB878']})
+        }
+      });
+      
+      //初演示 - 绑定输入框
+      // dropdown.render({
+      //   elem: '.demo2'
+      //   ,data: [{
+      //     title: 'menu item 1'
+      //     ,id: 101
+      //   },{
+      //     title: 'menu item 2'
+      //     ,id: 102
+      //   },{
+      //     title: 'menu item 3'
+      //     ,id: 103
+      //   },{
+      //     title: 'menu item 4'
+      //     ,id: 104
+      //   },{
+      //     title: 'menu item 5'
+      //     ,id: 105
+      //   },{
+      //     title: 'menu item 6'
+      //     ,id: 106
+      //   }]
+      //   ,click: function(obj){
+      //     this.elem.val(obj.title);
+      //   }
+      //   ,style: 'width: 235px;'
+      // });
+    })
+  </script>
 </body>
 </html>
