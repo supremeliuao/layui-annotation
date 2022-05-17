@@ -7,87 +7,38 @@
     <title>Document</title>
     <link rel="stylesheet" href="./src/css/layui.css">
     <script src="./jquery-3.3.1.js"></script>
+    <script src="./src/layui.js"></script>
 </head>
 <body>
+  <div style="margin-left: 30px;">
     <div id="test1"></div>
-    <button class="layui-btn" lay-active="kinghiee">点击</button>
-    <script src="./src/layui.js"></script>
-    <script>
-        layui.use(['tree', 'util'], function(){
-          var tree = layui.tree;
-          var util = layui.util;
-        
-          //渲染
-         tree.render({
-            elem: '#test1',  //绑定元素
-            id:'one',
-            // showLine: false,
-            accordion: true,
-            showCheckbox: true,
-            isJump: true,
-            edit: true,
-            data: [
-              {
-                title: '江西', //一级菜单
-                spread: true,
-                id:'11',
-                href:'https://www.baidu.com/?tn=06074089_21_pg',
-                children: [
-                  {
-                    title: '南昌', //二级菜单
-                    checked: true,
-                    id:'22',
-                    children: [
-                      {
-                        title: '高新区' //三级菜单
-                      }
-                    ]
-                  },
-                  {
-                    title: '南22昌', //二级菜单
-                    children: [
-                      {
-                        title: '高新22区', //三级菜单
-                        children: [
-                          {
-                            title: '你好'
-                          }
-                        ]
-                      },
-                      {
-                        title: '高新33区', //三级菜单
-                        children: [
-                          {
-                            title: '高新22区' //三级菜单
-                          },
-                          {
-                            title: '高新33区' //三级菜单
-                          }
-                        ]
-                      }
-                    ]
-                  }
-                ]
-              },
-              {
-                title: '陕西', //一级菜单
-                children: [
-                  {
-                    title: '西安' //二级菜单
-                  }
-                ]
-              }
-            ]
-          });
-
-          util.event('lay-active', {
-            kinghiee:function(othis){
-              tree.reload('one', {
-                data1:[]
-              })
-            }
-          })
+    <div id="test2" style="margin-left: 30px;"></div>
+  </div>
+  <script>
+    layui.use([ 'colorpicker', 'layer' ], function(){
+      var $ = layui.$
+      ,colorpicker = layui.colorpicker;
+      //常规使用
+      colorpicker.render(
+        {
+          elem: '#test1' //绑定元素
+          ,change: function(color){ //颜色改变的回调
+            layer.tips('选择了：'+ color, this.elem, {
+              tips: 1
+            });
+          }
         });
-    </script>
+        
+        //初始色值
+        colorpicker.render({
+          elem: '#test2',
+          color: '#2ec770', //设置默认色
+          predefine: true,
+          done: function(color){
+            layer.tips('选择了：'+ color, this.elem);
+          }
+        });
+  })
+  </script>
 </body>
 </html>
